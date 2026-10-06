@@ -1,0 +1,5 @@
+P001|Laptop|Electronics|850.00|10
+P002|Wireless Mouse|Accessories|25.00|25
+P003|Mechanical Keyboard|Accessories|60.00|15
+P004|USB-C Charger|Electronics|30.00|20
+P005|Headphones|Audio|45.00|12
