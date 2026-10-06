@@ -1,16 +1,61 @@
 print("===== E-COMMERCE PRODUCT MANAGEMENT SYSTEM =====")
 
-products = []
+
+def load_products():
+    products = []
+
+    try:
+        with open("products.txt", "r") as file:
+            for line in file:
+                data = line.strip().split("|")
+
+                if len(data) == 5:
+                    product = {
+                        "id": data[0],
+                        "name": data[1],
+                        "category": data[2],
+                        "price": float(data[3]),
+                        "stock": int(data[4])
+                    }
+
+                    products.append(product)
+
+    except FileNotFoundError:
+        print("Products file not found. Starting with empty product list.")
+
+    return products
+
+
+def save_products():
+    with open("products.txt", "w") as file:
+        for product in products:
+            file.write(
+                product["id"] + "|" +
+                product["name"] + "|" +
+                product["category"] + "|" +
+                str(product["price"]) + "|" +
+                str(product["stock"]) + "\n"
+            )
 
 
 def add_product():
     print("\n===== ADD PRODUCT =====")
 
     product_id = input("Enter product ID: ")
+
+    for product in products:
+        if product["id"] == product_id:
+            print("Product ID already exists.")
+            return
+
     name = input("Enter product name: ")
     category = input("Enter product category: ")
     price = float(input("Enter product price: "))
     stock = int(input("Enter stock quantity: "))
+
+    if price < 0 or stock < 0:
+        print("Price and stock cannot be negative.")
+        return
 
     product = {
         "id": product_id,
@@ -21,6 +66,7 @@ def add_product():
     }
 
     products.append(product)
+    save_products()
 
     print("Product added successfully!")
 
@@ -81,10 +127,24 @@ def update_product():
                 product["category"] = category
 
             if price:
-                product["price"] = float(price)
+                new_price = float(price)
+
+                if new_price >= 0:
+                    product["price"] = new_price
+                else:
+                    print("Price cannot be negative.")
+                    return
 
             if stock:
-                product["stock"] = int(stock)
+                new_stock = int(stock)
+
+                if new_stock >= 0:
+                    product["stock"] = new_stock
+                else:
+                    print("Stock cannot be negative.")
+                    return
+
+            save_products()
 
             print("Product updated successfully!")
             return
@@ -100,6 +160,8 @@ def delete_product():
     for product in products:
         if product["id"] == product_id:
             products.remove(product)
+            save_products()
+
             print("Product deleted successfully!")
             return
 
@@ -118,6 +180,8 @@ def update_stock():
 
             if quantity >= 0:
                 product["stock"] = quantity
+                save_products()
+
                 print("Stock updated successfully!")
             else:
                 print("Stock quantity cannot be negative.")
@@ -140,6 +204,10 @@ def calculate_inventory_value():
         total_value += product["price"] * product["stock"]
 
     print("Total Inventory Value: $", total_value)
+
+
+# Load products from file when program starts
+products = load_products()
 
 
 while True:
